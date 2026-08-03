@@ -18,6 +18,8 @@ import AusleiheRueckgabeDetailPage from '@/pages/AusleiheRueckgabeDetailPage';
 import WartungPruefungPage from '@/pages/WartungPruefungPage';
 import WartungPruefungDetailPage from '@/pages/WartungPruefungDetailPage';
 // <custom:imports>
+const WerkzeugAusleihenPage = lazy(() => import('@/pages/intents/WerkzeugAusleihenPage'));
+const WerkzeugRueckgabePage = lazy(() => import('@/pages/intents/WerkzeugRueckgabePage'));
 // </custom:imports>
 
 // Lazy: public pages live outside <Layout> and only load on /#/public/:slug —
@@ -45,6 +47,8 @@ export default function App() {
                 <Route path="admin" element={<AdminPage />} />
                 <Route path="verwaltung/oeffentliche-seiten" element={<PublicPagesAdmin />} />
                 {/* <custom:routes> */}
+                <Route path="intents/werkzeug-ausleihen" element={<Suspense fallback={null}><WerkzeugAusleihenPage /></Suspense>} />
+                <Route path="intents/werkzeug-rueckgabe" element={<Suspense fallback={null}><WerkzeugRueckgabePage /></Suspense>} />
                 {/* </custom:routes> */}
               </Route>
             </Routes>
