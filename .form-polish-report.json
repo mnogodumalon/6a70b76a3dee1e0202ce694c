@@ -1,0 +1,28 @@
+{
+  "entities": {
+    "Mitarbeiterverwaltung": {
+      "placeholders_set": 8,
+      "defaults_keys": ["abteilung"],
+      "computed_keys": [],
+      "reason": "Reine Stammdaten-Verwaltung: Personaldaten, Kontaktinformationen, Abteilungszuordnung. Keine berechneten Felder, keine Preis-Lookups, keine Date-Paare für Dauern. Defaults nur für Abteilung (pragmatischer Preset)."
+    },
+    "Werkzeugverwaltung": {
+      "placeholders_set": 11,
+      "defaults_keys": ["zustand"],
+      "computed_keys": [],
+      "reason": "Werkzeug-Stammdaten mit Wartungs-Timing: Kaufdatum und Prüfintervall sind Eingaben, nicht Berechnungen. Nächste Prüfung ist User-Input (keine Formel). Keine computed, nur Zustand-Default für pragmatische Vorauswahl."
+    },
+    "Ausleihe & Rückgabe": {
+      "placeholders_set": 8,
+      "defaults_keys": ["ausleihdatum", "geplante_rueckgabe", "status"],
+      "computed_keys": ["_ausleihe_dauer_tage"],
+      "reason": "Ausleihtransaktion mit Date-Pair (ausleihdatum + geplante_rueckgabe) → virtuelle Dauer-Berechnung. Status-Default auf 'Ausgeliehen' (logischer Start-Zustand). Keine Preis-Applookups vorhanden (Ausleihe ist kostenlos)."
+    },
+    "Wartung & Prüfung": {
+      "placeholders_set": 8,
+      "defaults_keys": ["datum_wartung", "art_massnahme", "ergebnis", "naechste_pruefung_wartung"],
+      "computed_keys": ["_wartung_dauer_tage"],
+      "reason": "Wartungs-Historie mit Maßnahmen-Datum und Folgetermin. Virtuelle Dauer (Tage bis zur nächsten Prüfung). Defaults für typische Wartungs-Starts: heute, Routinewartung, Status In Bearbeitung, Folgedatum +30 Tage. Kosten sind manuell (keine Berechnung)."
+    }
+  }
+}

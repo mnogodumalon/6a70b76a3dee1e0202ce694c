@@ -1,0 +1,32 @@
+Legend: `!` after a field name = required (from the app's base view) —
+a step form that writes such a field must not submit it empty.
+A lookup field lists its keys after the type (`[lookup/select: a|b|c]`);
+these are the ONLY valid write values — quote them into the brief verbatim,
+the matching labels come from LOOKUP_OPTIONS at runtime.
+`⚙` lists the service methods for that entity, spelled exactly.
+
+Modules — copy these paths verbatim into a subagent brief:
+  @/types/app                            entity types, APP_IDS, LOOKUP_OPTIONS
+  @/types/enriched                       EnrichedAusleiheRueckgabe, EnrichedWartungPruefung — the COMPLETE list, no other Enriched* type exists
+  @/services/livingAppsService           LivingAppsService, createRecordUrl, extractRecordId
+  @/hooks/useDashboardData               useDashboardData
+  @/lib/formatters                       lookupKey, formatDate
+  @/components/blocks/IntentWizardShell  IntentWizardShell
+  @/components/blocks/EntitySelectStep   EntitySelectStep
+  @/components/blocks/StatusBadge        StatusBadge, getStatusColor
+  @/components/blocks/BudgetTracker      BudgetTracker
+There is NO `@/config/appIds`, no `@/config/lookupOptions` and no
+`@/lib/urlUtils` — APP_IDS and LOOKUP_OPTIONS come from `@/types/app`,
+createRecordUrl from the service. Note the lowercase `l` in the service path.
+
+- Mitarbeiterverwaltung (mitarbeiterverwaltung): vorname![string/text], nachname![string/text], geburtsdatum[date/date], personalnummer![string/text], abteilung[lookup/select: installation|wartung|lager|montage|buero|sonstiges], telefon[string/tel], handy[string/tel], email[string/email]
+  ⚙ getMitarbeiterverwaltung() · getMitarbeiterverwaltungEntry(id) · createMitarbeiterverwaltungEntry(fields) · updateMitarbeiterverwaltungEntry(id, fields) · deleteMitarbeiterverwaltungEntry(id)
+- Werkzeugverwaltung (werkzeugverwaltung): bezeichnung![string/text], werkzeugnummer![string/text], kategorie![lookup/select: handwerkzeug|elektrowerkzeug|messgeraet|pruefgeraet|schutzausruestung|sonstiges], hersteller[string/text], modell[string/text], kaufdatum[date/date], lagerort[string/text], zustand![lookup/select: neuwertig|gut|gebraucht|reparaturbeduerftigt|ausser_betrieb], pruefintervall_monate[number], naechste_pruefung[date/date], bild[file], bemerkung_werkzeug[string/textarea]
+  ⚙ getWerkzeugverwaltung() · getWerkzeugverwaltungEntry(id) · createWerkzeugverwaltungEntry(fields) · updateWerkzeugverwaltungEntry(id, fields) · deleteWerkzeugverwaltungEntry(id)
+- Ausleihe & Rückgabe (ausleihe_rueckgabe): werkzeug![applookup/select], ausleihdatum![date/datetimeminute], geplante_rueckgabe[date/date], tatsaechliche_rueckgabe[date/date], status![lookup/radio: ausgeliehen|zurueckgegeben|verloren], einsatzort[string/text], mitarbeiter![applookup/select], bemerkung_ausleihe[string/textarea]
+  ⚙ getAusleiheRueckgabe() · getAusleiheRueckgabeEntry(id) · createAusleiheRueckgabeEntry(fields) · updateAusleiheRueckgabeEntry(id, fields) · deleteAusleiheRueckgabeEntry(id)
+  → werkzeug links to app_id 6a70b7450a89d4b38b6e7894
+  → mitarbeiter links to app_id 6a70b73f33c382c6d3f0f818
+- Wartung & Prüfung (wartung_pruefung): werkzeug_wartung![applookup/select], datum_wartung![date/date], art_massnahme![lookup/select: routinewartung|reparatur|sicherheitspruefung|kalibrierung|reinigung|sonstiges_wartung], durchgefuehrt_von[string/text], ergebnis[lookup/radio: bestanden|nicht_bestanden|bedingt_bestanden|in_bearbeitung], naechste_pruefung_wartung[date/date], kosten[number], dokument[file], bemerkung_wartung[string/textarea]
+  ⚙ getWartungPruefung() · getWartungPruefungEntry(id) · createWartungPruefungEntry(fields) · updateWartungPruefungEntry(id, fields) · deleteWartungPruefungEntry(id)
+  → werkzeug_wartung links to app_id 6a70b7450a89d4b38b6e7894

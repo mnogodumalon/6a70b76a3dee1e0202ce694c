@@ -1,0 +1,45 @@
+{
+  "MitarbeiterverwaltungDialog.tsx": {
+    "vorname": "z. B. Max",
+    "nachname": "z. B. Müller",
+    "geburtsdatum": "Wann wurdest du geboren?",
+    "personalnummer": "z. B. MA-001",
+    "abteilung": "Welche Abteilung?",
+    "email": "max@beispiel.de",
+    "telefon": "z. B. 030 1234567",
+    "handy": "z. B. 0170 123456"
+  },
+  "WerkzeugverwaltungDialog.tsx": {
+    "bezeichnung": "z. B. Schlagbohrmaschine",
+    "werkzeugnummer": "z. B. WZ-001",
+    "kategorie": "Welche Werkzeugkategorie?",
+    "hersteller": "z. B. Bosch",
+    "modell": "z. B. GSB 21-2 RE",
+    "kaufdatum": "Wann wurde es gekauft?",
+    "lagerort": "z. B. Regal A3",
+    "zustand": "Wie ist der Zustand?",
+    "pruefintervall_monate": "z. B. 12",
+    "naechste_pruefung": "Nächste Prüfung fällig am",
+    "bemerkung_werkzeug": "Besonderheiten, Schäden, Wartungshistorie..."
+  },
+  "AusleiheRueckgabeDialog.tsx": {
+    "werkzeug": "Welches Werkzeug wird ausgeliehen?",
+    "ausleihdatum": "Wann wird es ausgeliehen?",
+    "geplante_rueckgabe": "Wann wird es zurück erwartet?",
+    "tatsaechliche_rueckgabe": "Wann wurde es zurückgegeben?",
+    "status": "Was ist der aktuelle Status?",
+    "einsatzort": "z. B. Baustelle Hauptstraße",
+    "mitarbeiter": "Von welchem Mitarbeiter?",
+    "bemerkung_ausleihe": "Zustand bei Ausleihe, Besonderheiten..."
+  },
+  "WartungPruefungDialog.tsx": {
+    "werkzeug_wartung": "Welches Werkzeug wird gewartet?",
+    "datum_wartung": "Wann erfolgt die Maßnahme?",
+    "art_massnahme": "Welche Art von Maßnahme?",
+    "durchgefuehrt_von": "z. B. Hans Schmidt",
+    "ergebnis": "Wie lautet das Ergebnis?",
+    "naechste_pruefung_wartung": "Nächste Prüfung fällig am",
+    "kosten": "z. B. 45,50",
+    "bemerkung_wartung": "Befunde, Reparaturen, Besonderheiten..."
+  }
+}
