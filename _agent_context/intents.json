@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "flows": [
+    {
+      "path": "/intents/werkzeug-ausleihen",
+      "label": "Werkzeug ausleihen",
+      "description": "Werkzeug an Mitarbeiter ausleihen",
+      "file": "src/pages/intents/WerkzeugAusleihenPage.tsx",
+      "summary": "/**\n * Werkzeug Ausleihen — 3-Schritt-Wizard.\n * Steps: 1) Mitarbeiter wählen → 2) Verfügbares Werkzeug wählen → 3) Ausleihdaten erfassen & Ausleihe anlegen.\n * Reads: mitarbeiterverwaltung, werkzeugverwaltung, ausleihe_rueckgabe.\n * Writes: ausleihe_rueckgabe (createAusleiheRueckgabeEntry).\n * Composes: IntentWizardShell, EntitySelectStep, StatusBadge.\n */",
+      "components": [
+        "Button",
+        "EntitySelectStep",
+        "Input",
+        "IntentWizardShell",
+        "Label",
+        "StatusBadge",
+        "Textarea"
+      ],
+      "writes": [
+        "createAusleiheRueckgabeEntry"
+      ]
+    },
+    {
+      "path": "/intents/werkzeug-rueckgabe",
+      "label": "Werkzeug zurückgeben",
+      "description": "Rückgabe erfassen und Wartung einplanen",
+      "file": "src/pages/intents/WerkzeugRueckgabePage.tsx",
+      "summary": "/**\n * Werkzeug-Rückgabe — 3-Schritt-Wizard.\n * Steps: 1) Offene Ausleihe wählen (status=ausgeliehen) → 2) Rückgabe erfassen (update AusleiheRueckgabe)\n *        → 3) optional Wartung/Prüfung erfassen (create WartungPruefung, update Werkzeugverwaltung).\n * Reads: ausleiheRueckgabe, werkzeugverwaltung, mitarbeiterverwaltung.\n * Writes: updateAusleiheRueckgabeEntry, createWartungPruefungEntry, updateWerkzeugverwaltungEntry.\n * Composes: IntentWizardShell, EntitySelectStep, StatusBadge.\n */",
+      "components": [
+        "Button",
+        "EntitySelectStep",
+        "Input",
+        "IntentWizardShell",
+        "Label",
+        "Select",
+        "SelectContent",
+        "SelectItem",
+        "SelectTrigger",
+        "SelectValue",
+        "StatusBadge",
+        "Textarea"
+      ],
+      "writes": [
+        "createWartungPruefungEntry",
+        "updateAusleiheRueckgabeEntry",
+        "updateWerkzeugverwaltungEntry"
+      ]
+    }
+  ],
+  "unregistered_pages": []
+}

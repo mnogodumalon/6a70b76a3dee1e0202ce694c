@@ -35,7 +35,11 @@ import {
   IconTool,
   IconAlertTriangle,
   IconUsers,
+  IconCalendarEvent,
+  IconLayoutKanban,
 } from '@tabler/icons-react';
+import { ResourceTimeline, type ResourceEvent, type ResourceGroup, type ResourceTone } from '@/components/widgets/ResourceTimeline';
+import { de } from 'date-fns/locale';
 
 // ─── Kanban columns aus dem Schema ───────────────────────────────────────────
 const AUSLEIHE_COLUMNS: KanbanColumn[] = (LOOKUP_OPTIONS['ausleihe_rueckgabe']?.['status'] ?? []).map(o => ({
@@ -85,6 +89,8 @@ export default function DashboardOverview() {
   const [werkzeugEditId, setWerkzeugEditId] = useState<string | undefined>();
 
   const [mitarbeiterOpen, setMitarbeiterOpen] = useState(false);
+
+  const [view, setView] = useState<'kanban' | 'timeline'>('kanban');
 
   // Heute-Datum
   const today = format(clock, 'yyyy-MM-dd');
@@ -185,6 +191,60 @@ export default function DashboardOverview() {
     }
   }, [setAusleiheRueckgabe, today, fetchAll]);
 
+  // ─── Timeline: Werkzeuge sortiert nach Nähe des Rückgabedatums zu heute ──
+  const timelineGroupsSorted = useMemo(() => {
+    const todayMs = parseISO(today).getTime();
+    return [...enrichedAusleiheRueckgabe]
+      .filter(a => !!a.fields.ausleihdatum)
+      .sort((a, b) => {
+        const distA = a.fields.geplante_rueckgabe
+          ? Math.abs(parseISO(a.fields.geplante_rueckgabe).getTime() - todayMs)
+          : Infinity;
+        const distB = b.fields.geplante_rueckgabe
+          ? Math.abs(parseISO(b.fields.geplante_rueckgabe).getTime() - todayMs)
+          : Infinity;
+        return distA - distB;
+      });
+  }, [enrichedAusleiheRueckgabe, today]);
+
+  const timelineGroups = useMemo<ResourceGroup[]>(() =>
+    timelineGroupsSorted.map(a => {
+      const status = lookupKey(a.fields.status);
+      let tone: ResourceTone = 'default';
+      if (status === 'verloren') tone = 'destructive';
+      else if (status === 'ausgeliehen' && a.fields.geplante_rueckgabe && a.fields.geplante_rueckgabe < today) tone = 'warning';
+      else if (status === 'ausgeliehen') tone = 'primary';
+      return {
+        key: a.record_id,
+        label: [a.werkzeugName, a.mitarbeiterName].filter(Boolean).join(' · ') || 'Werkzeug',
+        tone,
+      };
+    }),
+    [timelineGroupsSorted, today]
+  );
+
+  const timelineEvents = useMemo<ResourceEvent[]>(() =>
+    timelineGroupsSorted.flatMap(a => {
+      if (!a.fields.ausleihdatum) return [];
+      const status = lookupKey(a.fields.status);
+      let tone: ResourceTone = 'success';
+      if (status === 'verloren') tone = 'destructive';
+      else if (status === 'ausgeliehen' && a.fields.geplante_rueckgabe && a.fields.geplante_rueckgabe < today) tone = 'warning';
+      else if (status === 'ausgeliehen') tone = 'primary';
+      return [{
+        id: `ausleihe:${a.record_id}`,
+        start: a.fields.ausleihdatum,
+        end: a.fields.geplante_rueckgabe,
+        allDay: true,
+        title: a.werkzeugName || 'Werkzeug',
+        subtitle: a.mitarbeiterName || undefined,
+        tone,
+        group: a.record_id,
+      }];
+    }),
+    [timelineGroupsSorted, today]
+  );
+
   // ─── Hooks ENDE — ab hier nur Ableitungen ────────────────────────────────
 
   // ─── every hook ABOVE this line ──────────────────────────────────────────
@@ -219,7 +279,32 @@ export default function DashboardOverview() {
           <h1 className="text-2xl font-bold text-foreground truncate">Werkzeugmanagement</h1>
           <p className="text-sm text-muted-foreground mt-0.5 truncate">{contextLine}</p>
         </div>
-        <div className="flex shrink-0 gap-2 flex-wrap">
+        <div className="flex shrink-0 gap-2 flex-wrap items-center">
+          {/* View-Toggle */}
+          <div className="flex gap-0.5 bg-muted rounded-lg p-0.5">
+            <button
+              onClick={() => setView('kanban')}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-medium transition-colors ${
+                view === 'kanban'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <IconLayoutKanban size={15} className="shrink-0" />
+              <span className="hidden sm:inline">Kanban</span>
+            </button>
+            <button
+              onClick={() => setView('timeline')}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-medium transition-colors ${
+                view === 'timeline'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <IconCalendarEvent size={15} className="shrink-0" />
+              <span className="hidden sm:inline">Kalender</span>
+            </button>
+          </div>
           <button
             onClick={() => { setAusleiheDefaults(undefined); setAusleiheEditId(undefined); setAusleiheOpen(true); }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
@@ -282,18 +367,36 @@ export default function DashboardOverview() {
           </StatStrip>
         }
         primary={
-          <KanbanWidget
-            cards={kanbanCards}
-            columns={AUSLEIHE_COLUMNS}
-            defaultCollapsed={['verloren']}
-            onCardClick={card => overlay.replace({ type: 'ausleihe', id: card.id.split(':')[1] })}
-            onCardMove={moveCard}
-            onAddCard={column => {
-              setAusleiheDefaults({ status: column });
-              setAusleiheEditId(undefined);
-              setAusleiheOpen(true);
-            }}
-          />
+          view === 'kanban' ? (
+            <KanbanWidget
+              cards={kanbanCards}
+              columns={AUSLEIHE_COLUMNS}
+              defaultCollapsed={['verloren']}
+              onCardClick={card => overlay.replace({ type: 'ausleihe', id: card.id.split(':')[1] })}
+              onCardMove={moveCard}
+              onAddCard={column => {
+                setAusleiheDefaults({ status: column });
+                setAusleiheEditId(undefined);
+                setAusleiheOpen(true);
+              }}
+            />
+          ) : (
+            <ResourceTimeline
+              events={timelineEvents}
+              groups={timelineGroups}
+              axis="day"
+              defaultRange="2weeks"
+              defaultDate={clock}
+              locale={de}
+              weekDays={5}
+              onEventClick={ev => overlay.replace({ type: 'ausleihe', id: ev.id.split(':')[1] })}
+              onEmptyClick={(date, _group) => {
+                setAusleiheDefaults({ ausleihdatum: format(date, 'yyyy-MM-dd') });
+                setAusleiheEditId(undefined);
+                setAusleiheOpen(true);
+              }}
+            />
+          )
         }
         aside={
           <>
